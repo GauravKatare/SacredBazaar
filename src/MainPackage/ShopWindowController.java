@@ -1,11 +1,10 @@
 package MainPackage;
 
 import CustomerQueries.*;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -15,7 +14,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -98,34 +96,51 @@ public class ShopWindowController
             alert.setContentText("Product not found Please use better search ");
             alert.show();
         }
-        SplitPane[] productDetailsDisplay = new SplitPane[len];
+        AnchorPane[] productDetailsDisplay = new AnchorPane[len];
         for(int i=0;i<len;i++)
         {
             Product prod = prodList.get(i);
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("ProductDisplayDesign.fxml")) ;
-                productDetailsDisplay[i] = (SplitPane) loader.load();
-                ProductDesignController controller = loader.getController();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("FXML_files/ProductDisplay.fxml")) ;
+                productDetailsDisplay[i] = (AnchorPane) loader.load();
+                ProductDisplayController controller = loader.getController();
                 controller.BuyButton.setOnAction(e -> BuyProducts(prod));
                 if(flagadd==0)
                     controller.AddtoCart.setOnAction(e -> AddToCartProduct(prod));
                 else
-                    controller.AddtoCart.setVisible(false);
+                {
+                    controller.AddtoCart.setText("Remove from Cart");
+                    controller.AddtoCart.setOnAction(e-> RemoveFromCart(prod));
+                }
                 if(flagwishlist==0)
                     controller.AddtoWishList.setOnAction(e -> AddToWishListProduct(prod));
                 else
-                    controller.AddtoWishList.setVisible(false);
-                controller.QuantityAvail.setText(controller.QuantityAvail.getText() + prod.getQuantity());
+                {
+                    controller.AddtoWishList.setText("Remove From WishList");
+                    controller.AddtoWishList.setOnAction(e-> RemoveFromWishList(prod));
+                }
+                controller.RetailerName.setText(prod.getRetailer());
+                controller.productDescription.setText(controller.productDescription.getText() +"\n"+ prod.getQuantity());
                 controller.price.setText(controller.price.getText() + prod.getPrice());
                 controller.productCategory.setText(prod.getProductCategory());
                 controller.productDescription.setText(prod.getProductDescription());
                 controller.DiscountLabel.setText(controller.DiscountLabel.getText() + prod.getDiscount());
-                productDetailsDisplay[i].setPrefWidth(CentreDisplay.getPrefWidth());
+                productDetailsDisplay[i].setMinWidth(CentreDisplay.getWidth());
             } catch (IOException e) {
                 e.printStackTrace();
             }
             CentreDisplay.getChildren().add(productDetailsDisplay[i]);
         }
+    }
+
+    private void RemoveFromWishList(Product prod)
+    {
+
+    }
+
+    private void RemoveFromCart(Product prod)
+    {
+
     }
 
     private void BuyProducts(Product prod)

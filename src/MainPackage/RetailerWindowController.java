@@ -7,7 +7,6 @@ import RetailerQueries.LoadNotifications;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class RetailerWindowController
@@ -31,10 +29,10 @@ public class RetailerWindowController
     public BorderPane borderPane;
     FXMLLoader loader;
     Stage currentStage;
-
+    public VBox CDisplay;
     public void ShowProfile()
     {
-        loader = new FXMLLoader(getClass().getResource("RetailerProfile.fxml")) ;
+        loader = new FXMLLoader(getClass().getResource("FXML_files/RetailerProfile.fxml")) ;
         try
         {
             CentreDisplay = (ScrollPane) loader.load();
@@ -84,14 +82,14 @@ public class RetailerWindowController
 
     public void DisplayProducts(ArrayList<Product> prodList)
     {
-        VBox CDisplay = new VBox();
+        CDisplay.getChildren().clear();
         int len = prodList.size();
         SplitPane[] productDetailsDisplay = new SplitPane[len];
         for(int i=0;i<len;i++)
         {
             Product prod = prodList.get(i);
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("ProductDisplayDesign.fxml")) ;
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("FXML_files/ProductDisplayDesign.fxml")) ;
                 productDetailsDisplay[i] = (SplitPane) loader.load();
                 ProductDesignController controller = loader.getController();
                 controller.BuyButton.setVisible(false);
@@ -115,9 +113,7 @@ public class RetailerWindowController
                 e.printStackTrace();
             }
             CDisplay.getChildren().add(productDetailsDisplay[i]);
-
         }
-        borderPane.setCenter(CDisplay);
     }
 
     public void ShowNotifications()
@@ -132,16 +128,16 @@ public class RetailerWindowController
             pp = (ArrayList<PendingProducts>) ois.readObject();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e)
-        {
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         NotificationDesignController ndc;
-        VBox vBox = new VBox();
-        assert pp != null;
+        VBox vBox = CDisplay;
+        vBox.getChildren().clear();
+        System.out.println(pp.size());
         for(int i = 0; i<pp.size(); i++)
         {
-            loader = new FXMLLoader(getClass().getResource("NotificationDesign.fxml"));
+            loader = new FXMLLoader(getClass().getResource("FXML_files/NotificationDesign.fxml"));
             try
             {
                 vBox.getChildren().add(loader.load());
@@ -160,7 +156,6 @@ public class RetailerWindowController
             ndc.TotalAmountBox.setText(ndc.TotalAmountBox.getText() + Integer.toString(pp.get(i).getPrice()*pp.get(i).getQuantityOrdered()));
         }
         vBox.setFillWidth(true);
-        borderPane.setCenter(vBox);
     }
 
     public void ShowSoldProducts()
@@ -170,7 +165,7 @@ public class RetailerWindowController
 
     public void AddProduct()
     {
-        loader = new FXMLLoader(getClass().getResource("AddProduct.fxml"));
+        loader = new FXMLLoader(getClass().getResource("FXML_files/AddProduct.fxml"));
         try
         {
             borderPane.setCenter(loader.load());
@@ -202,7 +197,7 @@ public class RetailerWindowController
 
     public void EditProduct(Product prod) throws IOException {
         Stage s = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("ProductInfo.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("FXML_files/ProductInfo.fxml"));
         VBox display = loader.load();
         ProductInfoController controller = loader.getController();
         controller.CategoryBox.setText(prod.getProductCategory());
